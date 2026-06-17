@@ -6,11 +6,17 @@ struct SupplementsView: View {
     @Query(sort: \Supplement.name) private var supplements: [Supplement]
     @State private var showingAdd = false
 
-    private var grouped: [(SupplementCategory, [Supplement])] {
+    private struct CategoryGroup: Identifiable {
+        let category: SupplementCategory
+        let items: [Supplement]
+        var id: SupplementCategory { category }
+    }
+
+    private var grouped: [CategoryGroup] {
         let dict = Dictionary(grouping: supplements, by: { $0.category })
         return SupplementCategory.allCases.compactMap { cat in
             guard let items = dict[cat], !items.isEmpty else { return nil }
-            return (cat, items)
+            return CategoryGroup(category: cat, items: items)
         }
     }
 
@@ -28,9 +34,9 @@ struct SupplementsView: View {
                     }
                 } else {
                     List {
-                        ForEach(grouped, id: \.0) { cat, items in
-                            Section(cat.rawValue) {
-                                ForEach(items) { sup in
+                        ForEach(grouped) { group in
+                            Section(group.category.rawValue) {
+                                ForEach(group.items) { sup in
                                     NavigationLink {
                                         SupplementDetailView(supplement: sup)
                                     } label: {
@@ -38,7 +44,7 @@ struct SupplementsView: View {
                                     }
                                 }
                                 .onDelete { offsets in
-                                    delete(from: items, at: offsets)
+                                    delete(from: group.items, at: offsets)
                                 }
                             }
                         }
