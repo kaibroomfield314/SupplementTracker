@@ -4,66 +4,67 @@ import SwiftData
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var supplements: [Supplement]
-    @Query private var allIntakes: [SupplementIntake]
+    @Query private var intakes: [SupplementIntake]
+    @Query private var readings: [BloodMarkerReading]
 
     @State private var showingAdd = false
     @State private var prefillSupplement: Supplement?
 
-    private var todayIntakes: [SupplementIntake] {
-        let cal = Calendar.current
-        return allIntakes
-            .filter { cal.isDateInToday($0.date) }
-            .sorted { $0.date > $1.date }
+    private var metrics: DashboardMetrics {
+        DashboardMetrics.compute(
+            supplements: supplements,
+            intakes: intakes,
+            readings: readings
+        )
     }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section("Today, \(Date.now.formatted(date: .complete, time: .omitted))") {
-                    if todayIntakes.isEmpty {
-                        ContentUnavailableView(
-                            "Nothing logged yet",
-                            systemImage: "sun.max",
-                            description: Text("Tap a supplement below or use + to log an intake.")
-                        )
-                    } else {
-                        ForEach(todayIntakes) { intake in
-                            IntakeRow(intake: intake)
-                        }
-                        .onDelete(perform: deleteIntakes)
-                    }
-                }
+            ScrollView {
+                VStack(spacing: 16) {
+                    GreetingHeader()
 
-                if !supplements.isEmpty {
-                    Section("Quick log") {
-                        ForEach(supplements.sorted(by: { $0.name < $1.name })) { sup in
-                            Button {
+                    TodayRingCard(
+                        taken: metrics.todayUniqueCount,
+                        target: max(metrics.typicalCount, 1),
+                        progress: metrics.completionProgress
+                    )
+
+                    StatsRowCards(
+                        streak: metrics.topStreak,
+                        weekDelta: metrics.weekDeltaPercent
+                    )
+
+                    WeekChartCard(days: metrics.last7Days)
+
+                    RecentBloodCard(markers: metrics.recentMarkers)
+
+                    if !supplements.isEmpty {
+                        QuickLogStrip(
+                            supplements: supplements.sorted(by: { $0.name < $1.name }),
+                            onLog: { sup in
                                 prefillSupplement = sup
                                 showingAdd = true
-                            } label: {
-                                HStack {
-                                    Image(systemName: sup.category.symbol)
-                                        .frame(width: 28)
-                                        .foregroundStyle(.tint)
-                                    VStack(alignment: .leading) {
-                                        Text(sup.name).font(.body)
-                                        if sup.defaultDose > 0 {
-                                            Text("\(sup.defaultDose.clean) \(sup.unit)")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                    }
-                                    Spacer()
-                                    Image(systemName: "plus.circle")
-                                        .foregroundStyle(.tint)
-                                }
                             }
-                            .buttonStyle(.plain)
-                        }
+                        )
                     }
+
+                    TodayIntakesCard(
+                        intakes: metrics.todayIntakes,
+                        onDelete: { intake in
+                            modelContext.delete(intake)
+                        },
+                        onAdd: { showingAdd = true }
+                    )
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 24)
+                .animation(.spring(response: 0.6, dampingFraction: 0.8), value: metrics.todayUniqueCount)
+                .animation(.spring(response: 0.6, dampingFraction: 0.8), value: metrics.topStreak)
             }
-            .navigationTitle("Today")
+            .background(Color(uiColor: .systemBackground))
+            .navigationTitle("Home")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showingAdd = true } label: {
@@ -76,30 +77,86 @@ struct TodayView: View {
             }
         }
     }
+}
 
-    private func deleteIntakes(at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(todayIntakes[index])
+struct GreetingHeader: View {
+    private let date = Date.now
+
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(greeting)
+                    .font(.system(.title, design: .rounded).weight(.bold))
+                Text(date.formatted(.dateTime.weekday(.wide).month(.wide).day()))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+        }
+        .padding(.top, 8)
+    }
+
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: date)
+        switch hour {
+        case 5..<12: return "Good morning"
+        case 12..<17: return "Good afternoon"
+        case 17..<22: return "Good evening"
+        default: return "Hey, night owl"
         }
     }
 }
 
-struct IntakeRow: View {
-    let intake: SupplementIntake
+struct QuickLogStrip: View {
+    let supplements: [Supplement]
+    let onLog: (Supplement) -> Void
 
     var body: some View {
-        HStack {
-            Image(systemName: intake.supplement?.category.symbol ?? "pills")
-                .frame(width: 28)
-                .foregroundStyle(.tint)
-            VStack(alignment: .leading) {
-                Text(intake.supplement?.name ?? "Unknown")
-                    .font(.body)
-                Text("\(intake.amount.clean) \(intake.unit) · \(intake.date.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("Quick log")
+                    .font(.subheadline.bold())
+                Spacer()
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(supplements) { sup in
+                        QuickLogChip(supplement: sup, onTap: { onLog(sup) })
+                    }
+                }
+                .padding(.vertical, 2)
             }
         }
+    }
+}
+
+private struct QuickLogChip: View {
+    let supplement: Supplement
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: supplement.category.symbol)
+                    .font(.title3)
+                    .foregroundStyle(.tint)
+                Text(supplement.name)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                if supplement.defaultDose > 0 {
+                    Text("\(supplement.defaultDose.clean) \(supplement.unit)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: 130, alignment: .leading)
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(uiColor: .secondarySystemBackground))
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 
