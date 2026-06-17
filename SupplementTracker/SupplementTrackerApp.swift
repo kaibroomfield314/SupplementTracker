@@ -1,10 +1,3 @@
-//
-//  SupplementTrackerApp.swift
-//  SupplementTracker
-//
-//  Created by Kai Broomfield on 17/6/2026.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,12 +5,18 @@ import SwiftData
 struct SupplementTrackerApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Supplement.self,
+            SupplementIntake.self,
+            BloodTest.self,
+            BloodMarkerReading.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .automatic
+        )
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema, configurations: [config])
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
