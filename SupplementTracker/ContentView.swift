@@ -12,6 +12,9 @@ struct ContentView: View {
 
             BloodMarkersView()
                 .tabItem { Label("Blood", systemImage: "drop") }
+
+            SettingsView()
+                .tabItem { Label("Settings", systemImage: "gearshape") }
         }
     }
 }
