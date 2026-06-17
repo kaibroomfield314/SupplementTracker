@@ -6,10 +6,30 @@ struct SupplementsView: View {
     @Query(sort: \Supplement.name) private var supplements: [Supplement]
     @State private var showingAdd = false
 
-    private struct CategoryGroup: Identifiable {
-        let category: SupplementCategory
-        let items: [Supplement]
-        var id: SupplementCategory { category }
+    var body: some View {
+        NavigationStack {
+            content
+                .navigationTitle("Supplements")
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button { showingAdd = true } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showingAdd) {
+                    AddSupplementSheet()
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if supplements.isEmpty {
+            SupplementsEmptyState { showingAdd = true }
+        } else {
+            SupplementsList(groups: grouped, deleteAction: handleDelete)
+        }
     }
 
     private var grouped: [CategoryGroup] {
@@ -20,54 +40,73 @@ struct SupplementsView: View {
         }
     }
 
+    private func handleDelete(items: [Supplement], offsets: IndexSet) {
+        for index in offsets {
+            modelContext.delete(items[index])
+        }
+    }
+}
+
+private struct CategoryGroup: Identifiable {
+    let category: SupplementCategory
+    let items: [Supplement]
+    var id: SupplementCategory { category }
+}
+
+private struct SupplementsEmptyState: View {
+    let onAdd: () -> Void
+
     var body: some View {
-        NavigationStack {
-            Group {
-                if supplements.isEmpty {
-                    ContentUnavailableView {
-                        Label("No supplements yet", systemImage: "pills")
-                    } description: {
-                        Text("Add the vitamins, minerals, and supplements you take.")
-                    } actions: {
-                        Button("Add Supplement") { showingAdd = true }
-                            .buttonStyle(.borderedProminent)
-                    }
-                } else {
-                    List {
-                        ForEach(grouped) { group in
-                            Section(group.category.rawValue) {
-                                ForEach(group.items) { sup in
-                                    NavigationLink {
-                                        SupplementDetailView(supplement: sup)
-                                    } label: {
-                                        SupplementRow(supplement: sup)
-                                    }
-                                }
-                                .onDelete { offsets in
-                                    delete(from: group.items, at: offsets)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Supplements")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button { showingAdd = true } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-            .sheet(isPresented: $showingAdd) {
-                AddSupplementSheet()
+        ContentUnavailableView {
+            Label("No supplements yet", systemImage: "pills")
+        } description: {
+            Text("Add the vitamins, minerals, and supplements you take.")
+        } actions: {
+            Button("Add Supplement", action: onAdd)
+                .buttonStyle(.borderedProminent)
+        }
+    }
+}
+
+private struct SupplementsList: View {
+    let groups: [CategoryGroup]
+    let deleteAction: ([Supplement], IndexSet) -> Void
+
+    var body: some View {
+        List {
+            ForEach(groups) { group in
+                CategorySection(group: group, deleteAction: deleteAction)
             }
         }
     }
+}
 
-    private func delete(from items: [Supplement], at offsets: IndexSet) {
-        for index in offsets {
-            modelContext.delete(items[index])
+private struct CategorySection: View {
+    let group: CategoryGroup
+    let deleteAction: ([Supplement], IndexSet) -> Void
+
+    var body: some View {
+        Section {
+            ForEach(group.items) { sup in
+                SupplementRowLink(supplement: sup)
+            }
+            .onDelete { offsets in
+                deleteAction(group.items, offsets)
+            }
+        } header: {
+            Text(group.category.rawValue)
+        }
+    }
+}
+
+private struct SupplementRowLink: View {
+    let supplement: Supplement
+
+    var body: some View {
+        NavigationLink {
+            SupplementDetailView(supplement: supplement)
+        } label: {
+            SupplementRow(supplement: supplement)
         }
     }
 }
