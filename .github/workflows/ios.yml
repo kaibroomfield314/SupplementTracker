@@ -15,8 +15,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show Xcode version
-        run: xcodebuild -version
+      - name: Select newest Xcode 26+
+        run: |
+          set -euo pipefail
+          CANDIDATES=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V || true)
+          if [ -z "$CANDIDATES" ]; then
+            echo "::warning::No Xcode 26 found on runner; falling back to default Xcode. Build will likely fail because deployment target is iOS 26."
+            xcodebuild -version
+            exit 0
+          fi
+          XCODE_PATH=$(echo "$CANDIDATES" | tail -1)
+          echo "Selecting $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
 
       - name: Build
         run: |
