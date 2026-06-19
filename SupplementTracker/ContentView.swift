@@ -4,42 +4,21 @@ import SwiftData
 struct ContentView: View {
     var body: some View {
         TabView {
-            Tab { TodayView() } label: {
-                Label { Text("Home") } icon: {
-                    Image(systemName: "house.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.indigo)
-                }
+            Tab("Home", systemImage: "house.fill") {
+                TodayView()
             }
-            Tab { HistoryView() } label: {
-                Label { Text("History") } icon: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.orange)
-                }
+            Tab("History", systemImage: "clock.arrow.circlepath") {
+                HistoryView()
             }
-            Tab { SupplementsView() } label: {
-                Label { Text("Supplements") } icon: {
-                    Image(systemName: "pills.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.green)
-                }
+            Tab("Supplements", systemImage: "pills") {
+                SupplementsView()
             }
-            Tab { BloodMarkersView() } label: {
-                Label { Text("Blood") } icon: {
-                    Image(systemName: "drop.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.red)
-                }
+            Tab("Blood", systemImage: "drop") {
+                BloodMarkersView()
             }
-            Tab { SettingsView() } label: {
-                Label { Text("Settings") } icon: {
-                    Image(systemName: "gearshape.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.gray)
-                }
+            Tab("Settings", systemImage: "gearshape") {
+                SettingsView()
             }
-
         }
     }
 }
