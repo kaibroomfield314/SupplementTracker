@@ -9,6 +9,8 @@ struct SupplementTrackerApp: App {
             SupplementIntake.self,
             BloodTest.self,
             BloodMarkerReading.self,
+            Multivitamin.self,
+            MultivitaminIngredient.self,
         ])
         let config = ModelConfiguration(
             schema: schema,

@@ -25,10 +25,18 @@ struct SupplementsView: View {
 
     @ViewBuilder
     private var content: some View {
-        if supplements.isEmpty {
-            SupplementsEmptyState { showingAdd = true }
-        } else {
-            SupplementsList(groups: grouped, deleteAction: handleDelete)
+        List {
+            MultivitaminsNavLink()
+            if supplements.isEmpty {
+                Section {
+                    SupplementsEmptyState { showingAdd = true }
+                        .listRowBackground(Color.clear)
+                }
+            } else {
+                ForEach(grouped) { group in
+                    CategorySection(group: group, deleteAction: handleDelete)
+                }
+            }
         }
     }
 
@@ -68,14 +76,23 @@ private struct SupplementsEmptyState: View {
     }
 }
 
-private struct SupplementsList: View {
-    let groups: [CategoryGroup]
-    let deleteAction: ([Supplement], IndexSet) -> Void
-
+private struct MultivitaminsNavLink: View {
     var body: some View {
-        List {
-            ForEach(groups) { group in
-                CategorySection(group: group, deleteAction: deleteAction)
+        Section {
+            NavigationLink {
+                MultivitaminsView()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "rectangle.stack.fill")
+                        .foregroundStyle(.tint)
+                        .frame(width: 28)
+                    VStack(alignment: .leading) {
+                        Text("Multivitamins")
+                        Text("Log every ingredient in one tap")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
         }
     }
