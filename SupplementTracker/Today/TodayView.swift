@@ -6,6 +6,7 @@ struct TodayView: View {
     @Query private var supplements: [Supplement]
     @Query private var intakes: [SupplementIntake]
     @Query private var readings: [BloodMarkerReading]
+    @Query(sort: \Multivitamin.name) private var multivitamins: [Multivitamin]
 
     @State private var showingAdd = false
     @State private var prefillSupplement: Supplement?
@@ -39,6 +40,13 @@ struct TodayView: View {
 
                     RecentBloodCard(markers: metrics.recentMarkers)
 
+                    if !multivitamins.isEmpty {
+                        MultivitaminQuickLogCard(
+                            multivitamins: multivitamins,
+                            onLog: logMultivitamin
+                        )
+                    }
+
                     if !supplements.isEmpty {
                         QuickLogStrip(
                             supplements: supplements.sorted(by: { $0.name < $1.name }),
@@ -64,7 +72,7 @@ struct TodayView: View {
             }
             .background(Color(uiColor: .systemBackground))
             .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button { showingAdd = true } label: {
@@ -75,6 +83,14 @@ struct TodayView: View {
             .sheet(isPresented: $showingAdd, onDismiss: { prefillSupplement = nil }) {
                 AddIntakeSheet(preselected: prefillSupplement)
             }
+        }
+    }
+
+    private func logMultivitamin(_ multi: Multivitamin, servings: Int) -> Int {
+        do {
+            return try MultivitaminLogger.log(multivitamin: multi, servings: servings, in: modelContext)
+        } catch {
+            return 0
         }
     }
 }
