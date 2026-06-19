@@ -51,7 +51,7 @@ struct SupplementDetailView: View {
         }
         .navigationTitle(supplement.name)
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         #endif
         .toolbar {
             ToolbarItem(placement: .primaryAction) {

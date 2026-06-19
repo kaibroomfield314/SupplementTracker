@@ -81,7 +81,7 @@ struct MarkerTrendView: View {
         }
         .navigationTitle(markerName)
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         #endif
     }
 

@@ -42,7 +42,7 @@ struct BloodTestDetailView: View {
         }
         .navigationTitle(test.date.formatted(date: .abbreviated, time: .omitted))
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarTitleDisplayMode(.inline)
         #endif
         .sheet(isPresented: $showingAddReading) {
             AddReadingSheet(test: test)

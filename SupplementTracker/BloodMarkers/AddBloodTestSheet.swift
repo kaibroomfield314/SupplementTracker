@@ -28,7 +28,7 @@ struct AddBloodTestSheet: View {
             }
             .navigationTitle("New Blood Test")
             #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -107,7 +107,7 @@ struct AddReadingSheet: View {
             }
             .navigationTitle("Add Reading")
             #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
