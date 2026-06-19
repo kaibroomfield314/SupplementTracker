@@ -39,14 +39,7 @@ struct AddIntakeSheet: View {
                 }
 
                 Section("Amount") {
-                    HStack {
-                        TextField("Amount", value: $amount, format: .number)
-                            #if os(iOS)
-                            .keyboardType(.decimalPad)
-                            #endif
-                        TextField("Unit", text: $unit)
-                            .frame(maxWidth: 80)
-                    }
+                    AmountUnitField(amount: $amount, unit: $unit)
                     DatePicker("Time", selection: $date)
                 }
 
@@ -57,7 +50,7 @@ struct AddIntakeSheet: View {
             }
             .navigationTitle("Log Intake")
             #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

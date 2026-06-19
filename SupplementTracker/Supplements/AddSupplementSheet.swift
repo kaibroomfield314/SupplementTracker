@@ -39,14 +39,7 @@ struct AddSupplementSheet: View {
                     }
                 }
                 Section("Default dose") {
-                    HStack {
-                        TextField("Amount", value: $defaultDose, format: .number)
-                            #if os(iOS)
-                            .keyboardType(.decimalPad)
-                            #endif
-                        TextField("Unit", text: $unit)
-                            .frame(maxWidth: 80)
-                    }
+                    AmountUnitField(amount: $defaultDose, unit: $unit)
                 }
                 Section("Notes") {
                     TextField("Optional", text: $notes, axis: .vertical)
@@ -55,7 +48,7 @@ struct AddSupplementSheet: View {
             }
             .navigationTitle(existing == nil ? "New Supplement" : "Edit Supplement")
             #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
+            .toolbarTitleDisplayMode(.inline)
             #endif
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
