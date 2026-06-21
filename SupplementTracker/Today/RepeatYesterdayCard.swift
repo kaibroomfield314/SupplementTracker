@@ -11,33 +11,31 @@ struct RepeatYesterdayCard: View {
             loggedCount = n
             if n > 0 { Haptics.success() } else { Haptics.warning() }
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "arrow.counterclockwise.circle.fill")
-                    .font(.title)
-                    .foregroundStyle(.tint)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(loggedCount != nil ? "Logged \(loggedCount!) intakes" : "Repeat yesterday")
-                        .font(.subheadline.weight(.medium))
-                        .contentTransition(.numericText())
-                    Text(yesterdayCount > 0
-                         ? "Copy all \(yesterdayCount) of yesterday's intakes to today"
-                         : "Nothing logged yesterday yet")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.counterclockwise")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
+                Text(loggedCount != nil ? "Logged \(loggedCount!)" : "Repeat yesterday")
+                    .font(.system(size: 13, weight: .semibold))
+                    .contentTransition(.numericText())
                 Spacer()
+                Text("\(yesterdayCount) ITEMS")
+                    .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                    .tracking(0.4)
+                    .foregroundStyle(.secondary)
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.semibold))
+                    .font(.system(size: 10, weight: .semibold))
                     .foregroundStyle(.secondary)
             }
-            .padding(16)
+            .padding(.horizontal, DS.cardPadding)
+            .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemBackground))
+                RoundedRectangle(cornerRadius: DS.cardRadius, style: .continuous)
+                    .fill(DS.cardBG)
             )
         }
         .buttonStyle(.plain)
         .disabled(yesterdayCount == 0)
-        .opacity(yesterdayCount == 0 ? 0.55 : 1.0)
+        .opacity(yesterdayCount == 0 ? 0.5 : 1.0)
     }
 }

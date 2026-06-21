@@ -34,8 +34,8 @@ struct TodayView: View {
             FloatingAddButton {
                 showingAdd = true
             }
-            .padding(.trailing, 18)
-            .padding(.bottom, 18)
+            .padding(.trailing, 16)
+            .padding(.bottom, 16)
 
             VStack {
                 Spacer()
@@ -45,17 +45,10 @@ struct TodayView: View {
                         onUndo: { performUndo() },
                         onDismiss: { undoMessage = nil; lastDeletedIntake = nil }
                     )
-                    .padding(.bottom, 90)
+                    .padding(.bottom, 78)
                 }
             }
-            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: undoMessage)
-
-            if let milestone = celebratingMilestone {
-                StreakCelebrationOverlay(milestone: milestone) {
-                    celebratingMilestone = nil
-                }
-                .zIndex(100)
-            }
+            .animation(DS.snap, value: undoMessage)
         }
         .sheet(isPresented: $showingAdd, onDismiss: { prefillSupplement = nil }) {
             AddIntakeSheet(preselected: prefillSupplement)
@@ -66,22 +59,20 @@ struct TodayView: View {
 
     private var backdrop: some View {
         GradientBackdrop()
-            .frame(maxHeight: 360)
-            .mask(
-                LinearGradient(
-                    colors: [.black, .black.opacity(0.0)],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .ignoresSafeArea(edges: .top)
     }
 
     private var scrollContent: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 10) {
                 HeroHeader()
+                    .padding(.top, 6)
+
+                if let milestone = celebratingMilestone {
+                    StreakCelebrationOverlay(milestone: milestone) {
+                        celebratingMilestone = nil
+                    }
+                    .padding(.horizontal, -16)
+                }
 
                 GoalCounterCard()
 
@@ -151,8 +142,9 @@ struct TodayView: View {
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
-            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: metrics.todayUniqueCount)
-            .animation(.spring(response: 0.6, dampingFraction: 0.8), value: metrics.topStreak)
+            .animation(DS.snap, value: metrics.todayUniqueCount)
+            .animation(DS.snap, value: metrics.topStreak)
+            .animation(DS.snap, value: celebratingMilestone)
         }
         .scrollIndicators(.hidden)
         .refreshable {
@@ -255,20 +247,16 @@ struct QuickLogStrip: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Quick log")
-                    .font(.subheadline.bold())
-                Spacer()
-            }
+            SectionLabel(text: "Quick log", trailing: "\(supplements.count)")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     ForEach(supplements) { sup in
                         QuickLogChip(supplement: sup, onTap: { onLog(sup) })
                     }
                 }
-                .padding(.vertical, 2)
             }
         }
+        .cardSurface()
     }
 }
 
@@ -281,24 +269,27 @@ private struct QuickLogChip: View {
             Haptics.tap(.light)
             onTap()
         } label: {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 Image(systemName: supplement.category.symbol)
-                    .font(.title3)
-                    .foregroundStyle(.tint)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
                 Text(supplement.name)
-                    .font(.subheadline.weight(.medium))
+                    .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
                 if supplement.defaultDose > 0 {
                     Text("\(supplement.defaultDose.clean) \(supplement.unit)")
-                        .font(.caption2)
+                        .font(.system(size: 10, weight: .medium).monospacedDigit())
                         .foregroundStyle(.secondary)
+                } else {
+                    Text(" ")
+                        .font(.system(size: 10))
                 }
             }
-            .frame(width: 130, alignment: .leading)
-            .padding(12)
+            .frame(width: 120, alignment: .leading)
+            .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemBackground))
+                RoundedRectangle(cornerRadius: DS.chipRadius, style: .continuous)
+                    .fill(DS.chipBG)
             )
         }
         .buttonStyle(.plain)

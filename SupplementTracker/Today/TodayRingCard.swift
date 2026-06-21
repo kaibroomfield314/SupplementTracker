@@ -6,65 +6,48 @@ struct TodayRingCard: View {
     let progress: Double
 
     var body: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: 18) {
             ringView
-            statsView
+                .frame(width: 92, height: 92)
+            VStack(alignment: .leading, spacing: 6) {
+                SectionLabel(text: "Today")
+                BigStat(value: "\(taken)", unit: "/ \(target)", size: 30)
+                Text(supportText)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
             Spacer()
         }
-        .padding(20)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .cardSurface()
     }
 
     private var ringView: some View {
         ZStack {
             Circle()
-                .stroke(Color.secondary.opacity(0.15), lineWidth: 12)
+                .stroke(DS.trackColor, lineWidth: DS.ringStroke)
             Circle()
-                .trim(from: 0, to: progress)
+                .trim(from: 0, to: max(0.001, min(progress, 1.0)))
                 .stroke(
-                    LinearGradient(
-                        colors: [Color.green, Color.mint, Color.cyan],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                    Color.accentColor,
+                    style: StrokeStyle(lineWidth: DS.ringStroke, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.spring(response: 0.6, dampingFraction: 0.8), value: progress)
-            Text("\(Int(progress * 100))%")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .contentTransition(.numericText())
-                .monospacedDigit()
-        }
-        .frame(width: 110, height: 110)
-    }
-
-    private var statsView: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("Today")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-            Text("\(taken) of \(target)")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .contentTransition(.numericText())
-            Text(supportText)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .animation(DS.snap, value: progress)
+            VStack(spacing: 0) {
+                Text("\(Int(progress * 100))")
+                    .font(.system(size: 22, weight: .semibold).monospacedDigit())
+                    .contentTransition(.numericText())
+                Text("%")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .offset(y: -2)
+            }
         }
     }
 
     private var supportText: String {
-        if target == 0 { return "Add supplements to track" }
-        if taken >= target { return "Stack complete 🎯" }
-        let remaining = max(0, target - taken)
-        return "\(remaining) more to hit your usual stack"
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 24, style: .continuous)
-            .fill(Color(uiColor: .secondarySystemBackground))
+        if target == 0 { return "Configure typical stack" }
+        if taken >= target { return "Target met" }
+        return "\(max(0, target - taken)) remaining"
     }
 }

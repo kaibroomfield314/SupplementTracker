@@ -7,31 +7,25 @@ struct GoalCounterCard: View {
 
     var body: some View {
         if let goal {
-            HStack(spacing: 14) {
-                Image(systemName: "flag.checkered")
-                    .font(.title2)
-                    .foregroundStyle(.tint)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(goal.name)
-                        .font(.subheadline.bold())
-                    HStack(spacing: 6) {
-                        Text("Day \(goal.elapsedDays)")
-                            .font(.title2.bold().monospacedDigit())
-                            .contentTransition(.numericText())
-                        Text("of \(goal.totalDays)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    ProgressView(value: goal.progress)
-                        .tint(.indigo)
+            VStack(alignment: .leading, spacing: 8) {
+                SectionLabel(text: goal.name, trailing: "\(Int(goal.progress * 100))%")
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(goal.elapsedDays)")
+                        .font(.system(size: 32, weight: .semibold).monospacedDigit())
+                        .contentTransition(.numericText())
+                    Text("/ \(goal.totalDays)")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("DAYS")
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(0.5)
+                        .foregroundStyle(.secondary)
                 }
-                Spacer()
+                ProgressBar(progress: goal.progress)
+                    .frame(height: 4)
             }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemBackground))
-            )
+            .cardSurface()
         }
     }
 
@@ -42,5 +36,21 @@ struct GoalCounterCard: View {
             startDate: Date(timeIntervalSince1970: goalStartTimestamp),
             totalDays: goalDays
         )
+    }
+}
+
+private struct ProgressBar: View {
+    let progress: Double
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                Capsule().fill(DS.trackColor)
+                Capsule()
+                    .fill(Color.accentColor)
+                    .frame(width: geo.size.width * max(0, min(progress, 1.0)))
+                    .animation(DS.snap, value: progress)
+            }
+        }
     }
 }

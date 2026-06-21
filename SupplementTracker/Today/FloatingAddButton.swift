@@ -9,13 +9,13 @@ struct FloatingAddButton: View {
             action()
         } label: {
             Image(systemName: "plus")
-                .font(.title2.weight(.bold))
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white)
-                .frame(width: 56, height: 56)
+                .frame(width: 48, height: 48)
                 .background(
-                    Circle()
-                        .fill(Color.accentColor.gradient)
-                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.accentColor)
+                        .shadow(color: .black.opacity(0.18), radius: 6, x: 0, y: 3)
                 )
         }
         .buttonStyle(.plain)

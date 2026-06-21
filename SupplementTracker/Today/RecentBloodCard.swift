@@ -4,36 +4,27 @@ struct RecentBloodCard: View {
     let markers: [MarkerSnapshot]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Recent blood markers")
-                    .font(.subheadline.bold())
-                Spacer()
-                Image(systemName: "drop.fill")
-                    .foregroundStyle(.tint)
-                    .font(.caption)
-            }
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: "Blood", trailing: "\(markers.count)")
             if markers.isEmpty {
-                Text("Log a blood test to see trends here.")
-                    .font(.caption)
+                Text("Log a blood test to track trends")
+                    .font(.system(size: 12))
                     .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
             } else {
-                VStack(spacing: 10) {
-                    ForEach(markers) { marker in
+                VStack(spacing: 0) {
+                    ForEach(Array(markers.enumerated()), id: \.element.id) { idx, marker in
                         MarkerRow(marker: marker)
+                        if idx < markers.count - 1 {
+                            Divider()
+                                .overlay(DS.divider)
+                                .padding(.vertical, 6)
+                        }
                     }
                 }
             }
         }
-        .padding(16)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(uiColor: .secondarySystemBackground))
+        .cardSurface()
     }
 }
 
@@ -41,22 +32,22 @@ private struct MarkerRow: View {
     let marker: MarkerSnapshot
 
     var body: some View {
-        HStack(spacing: 12) {
-            Circle()
+        HStack(spacing: 10) {
+            RoundedRectangle(cornerRadius: 1.5)
                 .fill(statusColor)
-                .frame(width: 8, height: 8)
-            VStack(alignment: .leading, spacing: 2) {
+                .frame(width: 3, height: 28)
+            VStack(alignment: .leading, spacing: 1) {
                 Text(marker.name)
-                    .font(.subheadline)
+                    .font(.system(size: 13, weight: .medium))
                     .lineLimit(1)
-                Text(marker.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption2)
+                Text(marker.date.formatted(.dateTime.month(.abbreviated).day()))
+                    .font(.system(size: 10, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
             }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 2) {
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 1) {
                 Text("\(marker.value.clean) \(marker.unit)")
-                    .font(.subheadline.monospacedDigit())
+                    .font(.system(size: 13, weight: .semibold).monospacedDigit())
                 deltaView
             }
         }
@@ -67,14 +58,15 @@ private struct MarkerRow: View {
         if let pct = marker.deltaPercent {
             HStack(spacing: 2) {
                 Image(systemName: deltaSymbol(for: pct))
-                    .font(.caption2)
+                    .font(.system(size: 9, weight: .semibold))
                 Text(deltaText(for: pct))
-                    .font(.caption2.monospacedDigit())
+                    .font(.system(size: 10, weight: .semibold).monospacedDigit())
             }
-            .foregroundStyle(deltaColor(for: pct))
+            .foregroundStyle(.secondary)
         } else {
-            Text("first reading")
-                .font(.caption2)
+            Text("BASELINE")
+                .font(.system(size: 9, weight: .semibold))
+                .tracking(0.4)
                 .foregroundStyle(.secondary)
         }
     }
@@ -87,26 +79,14 @@ private struct MarkerRow: View {
 
     private func deltaText(for pct: Double) -> String {
         let sign = pct > 0 ? "+" : ""
-        let n = Int((pct * 100).rounded())
-        return "\(sign)\(n)%"
-    }
-
-    private func deltaColor(for pct: Double) -> Color {
-        guard abs(pct) > 0.005 else { return .secondary }
-        switch marker.status {
-        case .normal: return .green
-        case .low: return .blue
-        case .high: return .red
-        case .unknown: return .secondary
-        }
+        return "\(sign)\(Int((pct * 100).rounded()))%"
     }
 
     private var statusColor: Color {
         switch marker.status {
-        case .low: return .blue
-        case .normal: return .green
-        case .high: return .red
-        case .unknown: return .gray
+        case .normal: return .accentColor
+        case .low, .high: return .secondary
+        case .unknown: return DS.divider
         }
     }
 }

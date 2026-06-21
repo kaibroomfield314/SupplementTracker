@@ -5,7 +5,7 @@ struct StatsRowCards: View {
     let weekDelta: Double?
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             StreakCard(streak: streak)
             WeekDeltaCard(delta: weekDelta)
         }
@@ -16,41 +16,26 @@ struct StreakCard: View {
     let streak: StreakInfo?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
-                Text("🔥")
-                Text("Streak")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-            }
-            Text(daysText)
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .contentTransition(.numericText())
-            Text(subtitle)
-                .font(.caption)
+        VStack(alignment: .leading, spacing: 6) {
+            SectionLabel(text: "Streak")
+            BigStat(value: streakValue, unit: streak == nil ? nil : "d", size: 28)
+            Text(subtitle.uppercased())
+                .font(.system(size: 10, weight: .semibold))
+                .tracking(0.4)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .cardSurface()
     }
 
-    private var daysText: String {
+    private var streakValue: String {
         guard let streak else { return "—" }
-        return streak.days == 1 ? "1 day" : "\(streak.days) days"
+        return "\(streak.days)"
     }
 
     private var subtitle: String {
-        streak?.supplementName ?? "No streak yet"
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(uiColor: .secondarySystemBackground))
+        streak?.supplementName ?? "No active streak"
     }
 }
 
@@ -58,29 +43,25 @@ struct WeekDeltaCard: View {
     let delta: Double?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
+            SectionLabel(text: "7D vs prev")
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: arrowSymbol)
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(deltaColor)
-                Text("This week")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
+                Text(percentText)
+                    .font(.system(size: 28, weight: .semibold).monospacedDigit())
+                    .foregroundStyle(deltaColor)
+                    .contentTransition(.numericText())
             }
-            Text(percentText)
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(deltaColor)
-                .contentTransition(.numericText())
-            Text("vs previous 7 days")
-                .font(.caption)
+            Text("INTAKE VOLUME")
+                .font(.system(size: 10, weight: .semibold))
+                .tracking(0.4)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .cardSurface()
     }
 
     private var arrowSymbol: String {
@@ -92,20 +73,14 @@ struct WeekDeltaCard: View {
 
     private var deltaColor: Color {
         guard let delta else { return .secondary }
-        if delta > 0.01 { return .green }
-        if delta < -0.01 { return .orange }
+        if delta > 0.01 { return .accentColor }
+        if delta < -0.01 { return .secondary }
         return .secondary
     }
 
     private var percentText: String {
         guard let delta else { return "—" }
         let sign = delta > 0 ? "+" : ""
-        let pct = Int((delta * 100).rounded())
-        return "\(sign)\(pct)%"
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(uiColor: .secondarySystemBackground))
+        return "\(sign)\(Int((delta * 100).rounded()))%"
     }
 }

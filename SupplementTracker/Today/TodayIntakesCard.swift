@@ -10,52 +10,45 @@ struct TodayIntakesCard: View {
     @State private var confirmingDeleteAll = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Today's log")
-                    .font(.subheadline.bold())
-                Spacer()
+                SectionLabel(text: "Log", trailing: "\(intakes.count)")
                 if !intakes.isEmpty {
                     Menu {
                         Button {
                             onAdd()
                         } label: {
-                            Label("Log intake", systemImage: "plus.circle")
+                            Label("Log intake", systemImage: "plus")
                         }
                         Divider()
                         Button(role: .destructive) {
                             confirmingDeleteAll = true
                         } label: {
-                            Label("Delete all today (\(intakes.count))", systemImage: "trash")
+                            Label("Clear today (\(intakes.count))", systemImage: "trash")
                         }
                     } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .font(.title3)
+                        Image(systemName: "ellipsis")
+                            .font(.system(size: 12, weight: .semibold))
+                            .padding(6)
                     }
-                    .foregroundStyle(.tint)
-                } else {
-                    Button(action: onAdd) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.tint)
+                    .foregroundStyle(.secondary)
                 }
             }
 
             if intakes.isEmpty {
                 EmptyIntakeRow(onAdd: onAdd)
             } else {
-                VStack(spacing: 8) {
-                    ForEach(intakes) { intake in
+                VStack(spacing: 0) {
+                    ForEach(Array(intakes.enumerated()), id: \.element.id) { idx, intake in
                         IntakeRowItem(intake: intake, onDelete: { onDelete(intake) })
+                        if idx < intakes.count - 1 {
+                            Divider().overlay(DS.divider).padding(.vertical, 4)
+                        }
                     }
                 }
             }
         }
-        .padding(16)
-        .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .cardSurface()
         .confirmationDialog(
             "Delete all \(intakes.count) intakes from today?",
             isPresented: $confirmingDeleteAll,
@@ -68,11 +61,6 @@ struct TodayIntakesCard: View {
             Button("Cancel", role: .cancel) {}
         }
     }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 20, style: .continuous)
-            .fill(Color(uiColor: .secondarySystemBackground))
-    }
 }
 
 private struct EmptyIntakeRow: View {
@@ -80,15 +68,16 @@ private struct EmptyIntakeRow: View {
 
     var body: some View {
         Button(action: onAdd) {
-            HStack {
-                Image(systemName: "plus.circle.dashed")
-                    .font(.title3)
-                Text("Tap to log your first intake today")
-                    .font(.subheadline)
+            HStack(spacing: 8) {
+                Image(systemName: "plus")
+                    .font(.system(size: 11, weight: .semibold))
+                Text("LOG FIRST INTAKE")
+                    .font(.system(size: 11, weight: .semibold))
+                    .tracking(0.4)
                 Spacer()
             }
             .foregroundStyle(.secondary)
-            .padding(.vertical, 6)
+            .padding(.vertical, 4)
         }
         .buttonStyle(.plain)
     }
@@ -99,18 +88,23 @@ private struct IntakeRowItem: View {
     let onDelete: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             Image(systemName: intake.supplement?.category.symbol ?? "pills")
-                .foregroundStyle(.tint)
-                .frame(width: 28)
-            VStack(alignment: .leading, spacing: 2) {
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 22)
+            VStack(alignment: .leading, spacing: 1) {
                 Text(intake.supplement?.name ?? "Unknown")
-                    .font(.subheadline)
-                Text("\(intake.amount.clean) \(intake.unit) · \(intake.date.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption)
+                    .font(.system(size: 13, weight: .medium))
+                    .lineLimit(1)
+                Text(intake.date.formatted(.dateTime.hour().minute()))
+                    .font(.system(size: 10, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            Text("\(intake.amount.clean) \(intake.unit)")
+                .font(.system(size: 12, weight: .semibold).monospacedDigit())
+                .foregroundStyle(.secondary)
         }
         .contentShape(Rectangle())
         .contextMenu {

@@ -10,20 +10,19 @@ struct HeroHeader: View {
     private let date = Date.now
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             avatarView
-            VStack(alignment: .leading, spacing: 4) {
-                Text(greetingLine)
-                    .font(.system(.title, design: .rounded).weight(.bold))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(displayName)
+                    .font(.system(size: 22, weight: .semibold))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                Text(date.formatted(.dateTime.weekday(.wide).month(.wide).day()))
-                    .font(.subheadline)
+                Text(metaLine)
+                    .font(.system(size: 12, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
+                    .tracking(0.4)
             }
             Spacer()
         }
-        .padding(.top, 8)
         .onChange(of: photoSelection) { _, item in
             guard let item else { return }
             Task {
@@ -35,17 +34,15 @@ struct HeroHeader: View {
         }
     }
 
-    private var greetingLine: String {
-        let hour = Calendar.current.component(.hour, from: date)
-        let base: String
-        switch hour {
-        case 5..<12: base = "Good morning"
-        case 12..<17: base = "Good afternoon"
-        case 17..<22: base = "Good evening"
-        default: base = "Hey, night owl"
-        }
+    private var displayName: String {
         let trimmed = userName.trimmingCharacters(in: .whitespaces)
-        return trimmed.isEmpty ? base : "\(base), \(trimmed)"
+        return trimmed.isEmpty ? "Athlete" : trimmed
+    }
+
+    private var metaLine: String {
+        let day = date.formatted(.dateTime.weekday(.abbreviated)).uppercased()
+        let dateStr = date.formatted(.dateTime.month(.abbreviated).day())
+        return "\(day) · \(dateStr)"
     }
 
     @ViewBuilder
@@ -55,18 +52,17 @@ struct HeroHeader: View {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: 52, height: 52)
-                    .clipShape(Circle())
-                    .overlay(Circle().stroke(Color.white.opacity(0.6), lineWidth: 2))
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             } else {
-                ZStack {
-                    Circle()
-                        .fill(Color.accentColor.gradient)
-                        .frame(width: 52, height: 52)
-                    Text(initials)
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                }
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(DS.divider, lineWidth: 1)
+                    .frame(width: 40, height: 40)
+                    .overlay {
+                        Text(initials)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.secondary)
+                    }
             }
         }
         .buttonStyle(.plain)
@@ -79,7 +75,7 @@ struct HeroHeader: View {
 
     private var initials: String {
         let trimmed = userName.trimmingCharacters(in: .whitespaces)
-        guard !trimmed.isEmpty else { return "👤" }
+        guard !trimmed.isEmpty else { return "—" }
         let parts = trimmed.split(separator: " ")
         let first = parts.first?.first.map(String.init) ?? ""
         let last = parts.count > 1 ? (parts.last?.first.map(String.init) ?? "") : ""

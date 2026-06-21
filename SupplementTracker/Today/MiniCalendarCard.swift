@@ -1,26 +1,19 @@
 import SwiftUI
 
 struct MiniCalendarCard: View {
-    /// Set of date-start-of-day values where intakes occurred
     let activeDays: Set<Date>
     private let today: Date = Calendar.current.startOfDay(for: .now)
 
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(monthTitle)
-                    .font(.subheadline.bold())
-                Spacer()
-                Text("\(activeThisMonth) days active")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.secondary)
-            }
-            LazyVGrid(columns: columns, spacing: 6) {
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: monthTitle, trailing: "\(activeThisMonth) days")
+            LazyVGrid(columns: columns, spacing: 5) {
                 ForEach(weekdaySymbols, id: \.self) { sym in
-                    Text(sym)
-                        .font(.caption2)
+                    Text(sym.uppercased())
+                        .font(.system(size: 9, weight: .semibold))
+                        .tracking(0.3)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
                 }
@@ -29,15 +22,11 @@ struct MiniCalendarCard: View {
                 }
             }
         }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(uiColor: .secondarySystemBackground))
-        )
+        .cardSurface()
     }
 
     private var monthTitle: String {
-        today.formatted(.dateTime.month(.wide).year())
+        today.formatted(.dateTime.month(.wide))
     }
 
     private var weekdaySymbols: [String] {
@@ -72,7 +61,7 @@ struct MiniCalendarCard: View {
         guard let first = cal.date(from: comp),
               let range = cal.range(of: .day, in: .month, for: today)
         else { return [] }
-        let firstWeekday = cal.component(.weekday, from: first) // 1 = Sunday
+        let firstWeekday = cal.component(.weekday, from: first)
         var cells: [Cell] = []
         for _ in 1..<firstWeekday { cells.append(Cell(date: nil, day: nil)) }
         for d in range {
@@ -90,12 +79,14 @@ struct MiniCalendarCard: View {
                 let isToday = Calendar.current.isDate(date, inSameDayAs: today)
                 ZStack {
                     if isActive {
-                        Circle().fill(Color.green.opacity(isToday ? 1.0 : 0.55))
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.accentColor.opacity(isToday ? 1.0 : 0.55))
                     } else if isToday {
-                        Circle().strokeBorder(.tint, lineWidth: 1.5)
+                        RoundedRectangle(cornerRadius: 4)
+                            .strokeBorder(Color.accentColor, lineWidth: 1)
                     }
                     Text("\(day)")
-                        .font(.caption2.monospacedDigit())
+                        .font(.system(size: 10, weight: .semibold).monospacedDigit())
                         .foregroundStyle(isActive ? Color.white : .primary)
                 }
                 .aspectRatio(1, contentMode: .fit)

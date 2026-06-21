@@ -6,27 +6,29 @@ struct UndoToast: View {
     let onDismiss: () -> Void
 
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "arrow.uturn.backward.circle.fill")
-                .foregroundStyle(.white)
-                .font(.title3)
-            Text(message)
-                .font(.subheadline)
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.uturn.backward")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.8))
+            Text(message.uppercased())
+                .font(.system(size: 11, weight: .semibold))
+                .tracking(0.4)
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Spacer()
-            Button("Undo") {
+            Button("UNDO") {
                 Haptics.tap(.light)
                 onUndo()
             }
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.yellow)
+            .font(.system(size: 11, weight: .bold))
+            .tracking(0.6)
+            .foregroundStyle(Color.accentColor)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Color.black.opacity(0.82))
+            RoundedRectangle(cornerRadius: DS.cardRadius, style: .continuous)
+                .fill(.black.opacity(0.88))
         )
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))

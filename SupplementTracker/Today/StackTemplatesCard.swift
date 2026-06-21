@@ -10,16 +10,9 @@ struct StackTemplatesCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("Your stacks")
-                    .font(.subheadline.bold())
-                Spacer()
-                Image(systemName: "square.stack.3d.up.fill")
-                    .foregroundStyle(.tint)
-                    .font(.caption)
-            }
+            SectionLabel(text: "Stacks", trailing: "\(stacks.count)")
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     ForEach(stacks) { stack in
                         StackChip(
                             stack: stack,
@@ -29,14 +22,9 @@ struct StackTemplatesCard: View {
                         )
                     }
                 }
-                .padding(.vertical, 2)
             }
         }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Color(uiColor: .secondarySystemBackground))
-        )
+        .cardSurface()
     }
 
     private func handleTap(_ stack: SupplementStack) {
@@ -60,26 +48,36 @@ private struct StackChip: View {
 
     var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text(stack.emoji.isEmpty ? "💊" : stack.emoji)
-                    .font(.title2)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack {
+                    Text(stack.emoji.isEmpty ? "▮" : stack.emoji)
+                        .font(.system(size: 14))
+                    Spacer()
+                    if flashing {
+                        Text("+\(flashCount)")
+                            .font(.system(size: 10, weight: .semibold).monospacedDigit())
+                            .foregroundStyle(Color.accentColor)
+                    }
+                }
                 Text(stack.name.isEmpty ? "Stack" : stack.name)
-                    .font(.subheadline.weight(.medium))
+                    .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
-                Text(flashing ? "+\(flashCount) logged" : "\(stack.itemCount) supplements")
-                    .font(.caption2.monospacedDigit())
+                Text("\(stack.itemCount) items")
+                    .font(.system(size: 10, weight: .medium).monospacedDigit())
                     .foregroundStyle(.secondary)
-                    .contentTransition(.numericText())
             }
-            .frame(width: 150, alignment: .leading)
-            .padding(12)
+            .frame(width: 130, alignment: .leading)
+            .padding(10)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(uiColor: .tertiarySystemBackground))
+                RoundedRectangle(cornerRadius: DS.chipRadius, style: .continuous)
+                    .fill(DS.chipBG)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: DS.chipRadius, style: .continuous)
+                    .strokeBorder(flashing ? Color.accentColor : .clear, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
-        .scaleEffect(flashing ? 1.04 : 1.0)
-        .animation(.spring(response: 0.35, dampingFraction: 0.6), value: flashing)
+        .animation(DS.pop, value: flashing)
     }
 }
