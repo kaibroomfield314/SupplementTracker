@@ -32,5 +32,7 @@ struct ContentView: View {
             BloodMarkerReading.self,
             Multivitamin.self,
             MultivitaminIngredient.self,
+            SupplementStack.self,
+            StackItem.self,
         ], inMemory: true)
 }

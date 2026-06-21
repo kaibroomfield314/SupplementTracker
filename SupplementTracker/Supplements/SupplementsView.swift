@@ -27,6 +27,7 @@ struct SupplementsView: View {
     private var content: some View {
         List {
             MultivitaminsNavLink()
+            StacksNavLink()
             if supplements.isEmpty {
                 Section {
                     SupplementsEmptyState { showingAdd = true }
@@ -89,6 +90,28 @@ private struct MultivitaminsNavLink: View {
                     VStack(alignment: .leading) {
                         Text("Multivitamins")
                         Text("Log every ingredient in one tap")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct StacksNavLink: View {
+    var body: some View {
+        Section {
+            NavigationLink {
+                StacksView()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "square.stack.3d.up.fill")
+                        .foregroundStyle(.tint)
+                        .frame(width: 28)
+                    VStack(alignment: .leading) {
+                        Text("Stacks")
+                        Text("Bundle daily supplements into routines")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
