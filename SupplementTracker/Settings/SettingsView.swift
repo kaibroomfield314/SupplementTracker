@@ -13,9 +13,55 @@ struct SettingsView: View {
     @State private var intakesCSVURL: URL?
     @State private var bloodCSVURL: URL?
 
+    @AppStorage(UserPreferenceKeys.userName) private var userName: String = ""
+    @AppStorage(UserPreferenceKeys.goalName) private var goalName: String = ""
+    @AppStorage(UserPreferenceKeys.goalStart) private var goalStartTimestamp: Double = 0
+    @AppStorage(UserPreferenceKeys.goalDays) private var goalDays: Int = 0
+
+    private var goalStartBinding: Binding<Date> {
+        Binding(
+            get: { goalStartTimestamp > 0 ? Date(timeIntervalSince1970: goalStartTimestamp) : .now },
+            set: { goalStartTimestamp = $0.timeIntervalSince1970 }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    TextField("Your name", text: $userName)
+                        .textInputAutocapitalization(.words)
+                } header: {
+                    Text("Profile")
+                } footer: {
+                    Text("Shown in the home greeting. Tap your avatar circle on the dashboard to pick a photo.")
+                }
+
+                Section {
+                    TextField("Goal (e.g. 12-week cut)", text: $goalName)
+                    DatePicker("Start date", selection: goalStartBinding, displayedComponents: .date)
+                    Stepper(value: $goalDays, in: 0...365) {
+                        HStack {
+                            Text("Total days")
+                            Spacer()
+                            Text("\(goalDays)").monospacedDigit()
+                        }
+                    }
+                    if goalDays > 0 && !goalName.isEmpty {
+                        Button(role: .destructive) {
+                            goalName = ""
+                            goalDays = 0
+                            goalStartTimestamp = 0
+                        } label: {
+                            Label("Clear goal", systemImage: "xmark.circle")
+                        }
+                    }
+                } header: {
+                    Text("Current goal")
+                } footer: {
+                    Text("Track progress through any time-bound goal. Shows up on Home as a 'Day X of Y' card.")
+                }
+
                 Section("At a glance") {
                     LabeledContent("Supplements", value: "\(supplements.count)")
                     LabeledContent("Intakes logged", value: "\(intakes.count)")

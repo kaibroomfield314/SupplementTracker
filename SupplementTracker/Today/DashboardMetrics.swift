@@ -6,14 +6,30 @@ struct DashboardMetrics {
     let typicalCount: Int
     let topStreak: StreakInfo?
     let last7Days: [DayCount]
+    let last30Days: [DayCount]
     let weekDeltaPercent: Double?
     let recentMarkers: [MarkerSnapshot]
     let todayIntakes: [SupplementIntake]
+    let yesterdayIntakes: [SupplementIntake]
+    let activeDaysThisMonth: Set<Date>
+    let categoryBreakdown: CategoryBreakdown
 
     var completionProgress: Double {
         guard typicalCount > 0 else { return 0 }
         return min(1.0, Double(todayUniqueCount) / Double(typicalCount))
     }
+}
+
+struct CategoryBreakdown: Equatable {
+    let vitaminsTakenToday: Int
+    let vitaminsTarget: Int
+    let mineralsTakenToday: Int
+    let mineralsTarget: Int
+    let otherTakenToday: Int
+    let otherTarget: Int
+}
+
+extension DashboardMetrics {
 
     static func compute(
         supplements: [Supplement],
@@ -65,6 +81,14 @@ struct DashboardMetrics {
             let count = intakes.filter { $0.date >= day && $0.date < next }.count
             last7.append(DayCount(date: day, count: count))
         }
+
+        var last30: [DayCount] = []
+        for offset in (0..<30).reversed() {
+            guard let day = cal.date(byAdding: .day, value: -offset, to: today) else { continue }
+            let next = cal.date(byAdding: .day, value: 1, to: day) ?? day
+            let count = intakes.filter { $0.date >= day && $0.date < next }.count
+            last30.append(DayCount(date: day, count: count))
+        }
         let thisWeekTotal = last7.reduce(0) { $0 + $1.count }
         let prevWeekStart = cal.date(byAdding: .day, value: -14, to: today) ?? today
         let prevWeekEnd = cal.date(byAdding: .day, value: -7, to: today) ?? today
@@ -94,15 +118,61 @@ struct DashboardMetrics {
         snapshots.sort { $0.date > $1.date }
         let recent = Array(snapshots.prefix(4))
 
+        // Yesterday intakes (for repeat action)
+        let yesterday = cal.date(byAdding: .day, value: -1, to: today) ?? today
+        let yesterdayEnd = today
+        let yesterdayIntakes = intakes
+            .filter { $0.date >= yesterday && $0.date < yesterdayEnd }
+            .sorted { $0.date > $1.date }
+
+        // Active days this month (for mini calendar)
+        let monthComp = cal.dateComponents([.year, .month], from: today)
+        let monthStart = cal.date(from: monthComp) ?? today
+        let monthIntakes = intakes.filter { $0.date >= monthStart }
+        let activeDays = Set(monthIntakes.map { cal.startOfDay(for: $0.date) })
+
+        // Category breakdown for triple rings
+        let typicalSups = supplements.filter { typicalIds.contains($0.persistentModelID) }
+        func target(in cat: SupplementCategory) -> Int {
+            switch cat {
+            case .vitamin: typicalSups.filter { $0.category == .vitamin }.count
+            case .mineral: typicalSups.filter { $0.category == .mineral }.count
+            default: typicalSups.filter { !$0.category.isVitaminOrMineral }.count
+            }
+        }
+        let todayUniqueSet = Set(todayIntakes.compactMap { $0.supplement })
+        let vitaminsTaken = todayUniqueSet.filter { $0.category == .vitamin }.count
+        let mineralsTaken = todayUniqueSet.filter { $0.category == .mineral }.count
+        let otherTaken = todayUniqueSet.filter { !$0.category.isVitaminOrMineral }.count
+
+        let breakdown = CategoryBreakdown(
+            vitaminsTakenToday: vitaminsTaken,
+            vitaminsTarget: max(target(in: .vitamin), vitaminsTaken),
+            mineralsTakenToday: mineralsTaken,
+            mineralsTarget: max(target(in: .mineral), mineralsTaken),
+            otherTakenToday: otherTaken,
+            otherTarget: max(target(in: .other), otherTaken)
+        )
+
         return DashboardMetrics(
             todayUniqueCount: todayUnique.count,
             typicalCount: max(typicalIds.count, todayUnique.count),
             topStreak: bestStreak,
             last7Days: last7,
+            last30Days: last30,
             weekDeltaPercent: weekDelta,
             recentMarkers: recent,
-            todayIntakes: todayIntakes
+            todayIntakes: todayIntakes,
+            yesterdayIntakes: yesterdayIntakes,
+            activeDaysThisMonth: activeDays,
+            categoryBreakdown: breakdown
         )
+    }
+}
+
+extension SupplementCategory {
+    var isVitaminOrMineral: Bool {
+        self == .vitamin || self == .mineral
     }
 }
 

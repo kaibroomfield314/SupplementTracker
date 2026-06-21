@@ -5,6 +5,9 @@ struct TodayIntakesCard: View {
     let intakes: [SupplementIntake]
     let onDelete: (SupplementIntake) -> Void
     let onAdd: () -> Void
+    let onDeleteAll: () -> Void
+
+    @State private var confirmingDeleteAll = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -12,13 +15,32 @@ struct TodayIntakesCard: View {
                 Text("Today's log")
                     .font(.subheadline.bold())
                 Spacer()
-                Button(action: onAdd) {
-                    Label("Log", systemImage: "plus.circle.fill")
-                        .labelStyle(.iconOnly)
-                        .font(.title3)
+                if !intakes.isEmpty {
+                    Menu {
+                        Button {
+                            onAdd()
+                        } label: {
+                            Label("Log intake", systemImage: "plus.circle")
+                        }
+                        Divider()
+                        Button(role: .destructive) {
+                            confirmingDeleteAll = true
+                        } label: {
+                            Label("Delete all today (\(intakes.count))", systemImage: "trash")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                            .font(.title3)
+                    }
+                    .foregroundStyle(.tint)
+                } else {
+                    Button(action: onAdd) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title3)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tint)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.tint)
             }
 
             if intakes.isEmpty {
@@ -34,6 +56,17 @@ struct TodayIntakesCard: View {
         .padding(16)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .confirmationDialog(
+            "Delete all \(intakes.count) intakes from today?",
+            isPresented: $confirmingDeleteAll,
+            titleVisibility: .visible
+        ) {
+            Button("Delete all", role: .destructive) {
+                Haptics.warning()
+                onDeleteAll()
+            }
+            Button("Cancel", role: .cancel) {}
+        }
     }
 
     private var cardBackground: some View {
@@ -81,7 +114,10 @@ private struct IntakeRowItem: View {
         }
         .contentShape(Rectangle())
         .contextMenu {
-            Button(role: .destructive, action: onDelete) {
+            Button(role: .destructive) {
+                Haptics.warning()
+                onDelete()
+            } label: {
                 Label("Delete", systemImage: "trash")
             }
         }
