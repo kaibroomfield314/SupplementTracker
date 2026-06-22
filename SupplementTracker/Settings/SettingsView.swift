@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -17,6 +18,9 @@ struct SettingsView: View {
     @AppStorage(UserPreferenceKeys.goalName) private var goalName: String = ""
     @AppStorage(UserPreferenceKeys.goalStart) private var goalStartTimestamp: Double = 0
     @AppStorage(UserPreferenceKeys.goalDays) private var goalDays: Int = 0
+    @AppStorage(UserPreferenceKeys.notificationsEnabled) private var notificationsEnabled: Bool = false
+
+    @State private var showNotificationsDeniedAlert = false
 
     private var goalStartBinding: Binding<Date> {
         Binding(
@@ -60,6 +64,26 @@ struct SettingsView: View {
                     Text("Current goal")
                 } footer: {
                     Text("Track progress through any time-bound goal. Shows up on Home as a 'Day X of Y' card.")
+                }
+
+                Section {
+                    Toggle(isOn: $notificationsEnabled) {
+                        Label("Allow Notifications", systemImage: "bell")
+                    }
+                    .onChange(of: notificationsEnabled) { _, on in
+                        handleNotificationToggle(on)
+                    }
+                    if notificationsEnabled {
+                        NavigationLink {
+                            RemindersView()
+                        } label: {
+                            Label("Manage Reminders", systemImage: "list.bullet.clipboard")
+                        }
+                    }
+                } header: {
+                    Text("Notifications")
+                } footer: {
+                    Text("Per-stack reminders fire at the scheduled time with a Mark as Taken action that logs the full stack without opening the app.")
                 }
 
                 Section("At a glance") {
@@ -108,6 +132,40 @@ struct SettingsView: View {
                 Button("OK") { exportError = nil }
             } message: { msg in
                 Text(msg)
+            }
+            .alert("Notifications Disabled", isPresented: $showNotificationsDeniedAlert) {
+                Button("Open Settings") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("To receive reminders, allow notifications for SupplementTracker in Settings.")
+            }
+        }
+    }
+
+    private func handleNotificationToggle(_ on: Bool) {
+        Task {
+            if on {
+                let status = await NotificationScheduler.authorizationStatus()
+                if status == .denied {
+                    await MainActor.run {
+                        notificationsEnabled = false
+                        showNotificationsDeniedAlert = true
+                    }
+                    return
+                }
+                let granted = await NotificationScheduler.requestAuthorization()
+                guard granted else {
+                    await MainActor.run { notificationsEnabled = false }
+                    return
+                }
+                let all = (try? modelContext.fetch(FetchDescriptor<StackReminder>())) ?? []
+                await NotificationScheduler.reschedule(reminders: all)
+            } else {
+                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
             }
         }
     }

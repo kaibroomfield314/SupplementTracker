@@ -34,5 +34,6 @@ struct ContentView: View {
             MultivitaminIngredient.self,
             SupplementStack.self,
             StackItem.self,
+            StackReminder.self,
         ], inMemory: true)
 }

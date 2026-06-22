@@ -11,6 +11,9 @@ final class SupplementStack {
     @Relationship(deleteRule: .cascade, inverse: \StackItem.stack)
     var items: [StackItem]? = []
 
+    @Relationship(deleteRule: .cascade, inverse: \StackReminder.stack)
+    var reminders: [StackReminder]? = []
+
     init(name: String = "", emoji: String = "💊", notes: String = "") {
         self.name = name
         self.emoji = emoji
