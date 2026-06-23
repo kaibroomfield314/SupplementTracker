@@ -25,7 +25,7 @@ struct GoalCounterCard: View {
                 ProgressBar(progress: goal.progress)
                     .frame(height: 4)
             }
-            .cardSurface()
+            .cardSurface(radius: DS.chipRadius)
         }
     }
 
@@ -45,8 +45,8 @@ private struct ProgressBar: View {
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .leading) {
-                Capsule().fill(DS.trackColor)
-                Capsule()
+                RoundedRectangle(cornerRadius: 2).fill(DS.trackColor)
+                RoundedRectangle(cornerRadius: 2)
                     .fill(Color.accentColor)
                     .frame(width: geo.size.width * max(0, min(progress, 1.0)))
                     .animation(DS.snap, value: progress)

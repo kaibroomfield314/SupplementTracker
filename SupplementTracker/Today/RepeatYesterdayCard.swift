@@ -14,7 +14,7 @@ struct RepeatYesterdayCard: View {
             HStack(spacing: 10) {
                 Image(systemName: "arrow.counterclockwise")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(.secondary)
                 Text(loggedCount != nil ? "Logged \(loggedCount!)" : "Repeat yesterday")
                     .font(.system(size: 13, weight: .semibold))
                     .contentTransition(.numericText())

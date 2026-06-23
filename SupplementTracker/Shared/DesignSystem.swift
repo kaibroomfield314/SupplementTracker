@@ -25,11 +25,11 @@ enum DS {
 }
 
 extension View {
-    func cardSurface() -> some View {
+    func cardSurface(radius: CGFloat = DS.cardRadius) -> some View {
         self
             .padding(DS.cardPadding)
             .background(
-                RoundedRectangle(cornerRadius: DS.cardRadius, style: .continuous)
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
                     .fill(DS.cardBG)
             )
     }

@@ -16,8 +16,8 @@ struct TripleRingCard: View {
                     .frame(width: 92, height: 92)
                 VStack(spacing: 8) {
                     row(label: "Vitamins", taken: vitaminsTaken, target: vitaminsTarget, accent: .accentColor)
-                    row(label: "Minerals", taken: mineralsTaken, target: mineralsTarget, accent: .accentColor.opacity(0.75))
-                    row(label: "Other",    taken: otherTaken,    target: otherTarget,    accent: .accentColor.opacity(0.5))
+                    row(label: "Minerals", taken: mineralsTaken, target: mineralsTarget, accent: .primary.opacity(0.45))
+                    row(label: "Other",    taken: otherTaken,    target: otherTarget,    accent: .primary.opacity(0.25))
                 }
                 Spacer()
             }
@@ -31,10 +31,10 @@ struct TripleRingCard: View {
                  color: .accentColor,
                  inset: 0)
             ring(progress: progress(mineralsTaken, mineralsTarget),
-                 color: .accentColor.opacity(0.75),
+                 color: .primary.opacity(0.45),
                  inset: 14)
             ring(progress: progress(otherTaken, otherTarget),
-                 color: .accentColor.opacity(0.5),
+                 color: .primary.opacity(0.25),
                  inset: 28)
         }
     }

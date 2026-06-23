@@ -26,7 +26,7 @@ struct StreakCard: View {
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .cardSurface()
+        .cardSurface(radius: DS.chipRadius)
     }
 
     private var streakValue: String {
@@ -61,7 +61,7 @@ struct WeekDeltaCard: View {
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .cardSurface()
+        .cardSurface(radius: DS.chipRadius)
     }
 
     private var arrowSymbol: String {

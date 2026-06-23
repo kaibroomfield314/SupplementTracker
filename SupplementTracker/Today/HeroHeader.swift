@@ -14,7 +14,7 @@ struct HeroHeader: View {
             avatarView
             VStack(alignment: .leading, spacing: 2) {
                 Text(displayName)
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(.system(size: 26, weight: .semibold))
                     .lineLimit(1)
                 Text(metaLine)
                     .font(.system(size: 12, weight: .medium).monospacedDigit())

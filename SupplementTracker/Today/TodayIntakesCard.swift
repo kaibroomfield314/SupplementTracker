@@ -91,7 +91,7 @@ private struct IntakeRowItem: View {
         HStack(spacing: 10) {
             Image(systemName: intake.supplement?.category.symbol ?? "pills")
                 .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(.secondary)
                 .frame(width: 22)
             VStack(alignment: .leading, spacing: 1) {
                 Text(intake.supplement?.name ?? "Unknown")
