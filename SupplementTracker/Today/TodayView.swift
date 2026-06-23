@@ -61,9 +61,11 @@ struct TodayView: View {
         GradientBackdrop()
     }
 
+    private let bentoGap: CGFloat = 16
+
     private var scrollContent: some View {
         ScrollView {
-            VStack(spacing: 10) {
+            VStack(spacing: bentoGap) {
                 HeroHeader()
                     .padding(.top, 6)
 
@@ -74,28 +76,40 @@ struct TodayView: View {
                     .padding(.horizontal, -16)
                 }
 
-                GoalCounterCard()
-
-                TodayRingCard(
+                // MARK: Bento Row 1 — Hero tile (full width)
+                // Editorial 88pt "X / Y" adherence number with mini ring footer.
+                AdherenceHeroTile(
                     taken: metrics.todayUniqueCount,
                     target: max(metrics.typicalCount, 1),
                     progress: metrics.completionProgress
                 )
 
-                TripleRingCard(
-                    vitaminsTaken: metrics.categoryBreakdown.vitaminsTakenToday,
-                    vitaminsTarget: metrics.categoryBreakdown.vitaminsTarget,
-                    mineralsTaken: metrics.categoryBreakdown.mineralsTakenToday,
-                    mineralsTarget: metrics.categoryBreakdown.mineralsTarget,
-                    otherTaken: metrics.categoryBreakdown.otherTakenToday,
-                    otherTarget: metrics.categoryBreakdown.otherTarget
-                )
+                // MARK: Bento Row 2 — TripleRing tall (left 1×2) + Streak/WeekDelta stacked (right)
+                HStack(alignment: .top, spacing: bentoGap) {
+                    TripleRingCard(
+                        vitaminsTaken: metrics.categoryBreakdown.vitaminsTakenToday,
+                        vitaminsTarget: metrics.categoryBreakdown.vitaminsTarget,
+                        mineralsTaken: metrics.categoryBreakdown.mineralsTakenToday,
+                        mineralsTarget: metrics.categoryBreakdown.mineralsTarget,
+                        otherTaken: metrics.categoryBreakdown.otherTakenToday,
+                        otherTarget: metrics.categoryBreakdown.otherTarget
+                    )
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                StatsRowCards(
-                    streak: metrics.topStreak,
-                    weekDelta: metrics.weekDeltaPercent
-                )
+                    VStack(spacing: bentoGap) {
+                        StreakCard(streak: metrics.topStreak)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        WeekDeltaCard(delta: metrics.weekDeltaPercent)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .frame(height: 190)
 
+                // MARK: Bento Row 3 — Goal counter (full width, conditional)
+                GoalCounterCard()
+
+                // MARK: Bento Row 4 — Repeat yesterday (full width, conditional)
                 if !metrics.yesterdayIntakes.isEmpty {
                     RepeatYesterdayCard(
                         yesterdayCount: metrics.yesterdayIntakes.count,
@@ -103,15 +117,21 @@ struct TodayView: View {
                     )
                 }
 
+                // MARK: Bento Row 5 — HealthSnapshotCard (full-width tile)
+                // HEALTHKIT SLOT: This is the reserved bento position for Apple Health data.
+                // Size: full-width (2×1 wide). To resize to tall (1×2), wrap in an HStack
+                // alongside RepeatYesterdayCard above and give each .frame(maxWidth: .infinity).
+                HealthSnapshotCard()
+
+                // MARK: Bento Row 6 — Week chart (full width)
                 WeekChartCard(days: metrics.last7Days)
 
+                // MARK: Detail section — full-width cards below the bento grid
                 HeatmapCard(days: metrics.last30Days)
 
                 MiniCalendarCard(activeDays: metrics.activeDaysThisMonth)
 
                 RecentBloodCard(markers: metrics.recentMarkers)
-
-                HealthSnapshotCard()
 
                 if !stacks.isEmpty {
                     StackTemplatesCard(stacks: stacks, onLog: logStack)
@@ -274,7 +294,7 @@ private struct QuickLogChip: View {
             VStack(alignment: .leading, spacing: 4) {
                 Image(systemName: supplement.category.symbol)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(.secondary)
                 Text(supplement.name)
                     .font(.system(size: 13, weight: .semibold))
                     .lineLimit(1)
