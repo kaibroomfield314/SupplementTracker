@@ -10,8 +10,8 @@ struct MiniCalendarCard: View {
         VStack(alignment: .leading, spacing: 10) {
             SectionLabel(text: monthTitle, trailing: "\(activeThisMonth) days")
             LazyVGrid(columns: columns, spacing: 5) {
-                ForEach(weekdaySymbols, id: \.self) { sym in
-                    Text(sym.uppercased())
+                ForEach(weekdaySymbols.indices, id: \.self) { i in
+                    Text(weekdaySymbols[i].uppercased())
                         .font(.system(size: 9, weight: .semibold))
                         .tracking(0.3)
                         .foregroundStyle(.secondary)
