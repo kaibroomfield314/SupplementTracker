@@ -82,6 +82,11 @@
 				TargetAttributes = {
 					E540F42B2FE2B50C0052C6BB = {
 						CreatedOnToolsVersion = 26.5;
+						SystemCapabilities = {
+							com.apple.HealthKit = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -251,12 +256,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SupplementTracker/SupplementTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F2X99HGGKA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to scan supplement labels into ingredients";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "SupplementTracker reads body weight, workouts, sleep, and resting heart rate to show your health context on the dashboard.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SupplementTracker uses notifications to remind you to take your supplement stacks.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -285,12 +292,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SupplementTracker/SupplementTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = F2X99HGGKA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Used to scan supplement labels into ingredients";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "SupplementTracker reads body weight, workouts, sleep, and resting heart rate to show your health context on the dashboard.";
 				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "SupplementTracker uses notifications to remind you to take your supplement stacks.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
