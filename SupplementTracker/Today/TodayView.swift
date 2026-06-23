@@ -111,6 +111,8 @@ struct TodayView: View {
 
                 RecentBloodCard(markers: metrics.recentMarkers)
 
+                HealthSnapshotCard()
+
                 if !stacks.isEmpty {
                     StackTemplatesCard(stacks: stacks, onLog: logStack)
                 }

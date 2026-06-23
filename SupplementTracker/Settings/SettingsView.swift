@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import HealthKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
@@ -19,6 +20,7 @@ struct SettingsView: View {
     @AppStorage(UserPreferenceKeys.goalStart) private var goalStartTimestamp: Double = 0
     @AppStorage(UserPreferenceKeys.goalDays) private var goalDays: Int = 0
     @AppStorage(UserPreferenceKeys.notificationsEnabled) private var notificationsEnabled: Bool = false
+    @AppStorage(UserPreferenceKeys.healthKitConnected) private var healthKitConnected: Bool = false
 
     @State private var showNotificationsDeniedAlert = false
 
@@ -84,6 +86,36 @@ struct SettingsView: View {
                     Text("Notifications")
                 } footer: {
                     Text("Per-stack reminders fire at the scheduled time with a Mark as Taken action that logs the full stack without opening the app.")
+                }
+
+                if HKHealthStore.isHealthDataAvailable() {
+                    Section {
+                        if healthKitConnected {
+                            Label("Apple Health Connected", systemImage: "heart.fill")
+                                .foregroundStyle(.pink)
+                            Button("Refresh Health Data") {
+                                Task {
+                                    await HealthService.shared.requestAuthorization()
+                                    await HealthService.shared.refresh()
+                                }
+                            }
+                        } else {
+                            Button {
+                                Task {
+                                    await HealthService.shared.requestAuthorization()
+                                    healthKitConnected = true
+                                    await HealthService.shared.refresh()
+                                }
+                            } label: {
+                                Label("Connect Apple Health", systemImage: "heart.fill")
+                                    .foregroundStyle(.pink)
+                            }
+                        }
+                    } header: {
+                        Text("Health")
+                    } footer: {
+                        Text("Read-only access to body weight, workouts, sleep, and resting heart rate. Shown on the dashboard.")
+                    }
                 }
 
                 Section("At a glance") {

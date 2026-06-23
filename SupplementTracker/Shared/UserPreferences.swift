@@ -10,6 +10,7 @@ enum UserPreferenceKeys {
     static let lastCelebratedStreak = "userPref.lastCelebratedStreak"
     static let undoArmedID = "userPref.undoArmedID"
     static let notificationsEnabled = "userPref.notificationsEnabled"
+    static let healthKitConnected = "userPref.healthKitConnected"
 }
 
 struct GoalInfo: Equatable {
