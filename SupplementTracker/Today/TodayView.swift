@@ -76,6 +76,9 @@ struct TodayView: View {
                     .padding(.horizontal, -16)
                 }
 
+                // MARK: AI Summary — single clinical headline above the hero
+                AISummaryCard(metrics: metrics, refreshID: refreshTrigger)
+
                 // MARK: Bento Row 1 — Hero tile (full width)
                 // Editorial 88pt "X / Y" adherence number with mini ring footer.
                 AdherenceHeroTile(
