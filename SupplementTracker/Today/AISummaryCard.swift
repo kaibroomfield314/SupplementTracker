@@ -25,8 +25,8 @@ struct AISummaryCard: View {
             Text(summary)
                 .font(.system(size: 13, weight: .medium).monospacedDigit())
                 .foregroundStyle(.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.85)
+                .lineLimit(2)
+                .minimumScaleFactor(0.9)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             if service.isGenerating {

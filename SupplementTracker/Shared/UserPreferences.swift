@@ -11,6 +11,7 @@ enum UserPreferenceKeys {
     static let undoArmedID = "userPref.undoArmedID"
     static let notificationsEnabled = "userPref.notificationsEnabled"
     static let healthKitConnected = "userPref.healthKitConnected"
+    static let weightUnit = "userPref.weightUnit"
 }
 
 struct GoalInfo: Equatable {

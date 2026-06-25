@@ -3,7 +3,7 @@ import SwiftData
 
 struct TodayView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var supplements: [Supplement]
+    @Query(filter: #Predicate<Supplement> { $0.isIngredient == false }) private var supplements: [Supplement]
     @Query private var intakes: [SupplementIntake]
     @Query private var readings: [BloodMarkerReading]
     @Query(sort: \Multivitamin.name) private var multivitamins: [Multivitamin]
@@ -108,6 +108,7 @@ struct TodayView: View {
                     .frame(maxWidth: .infinity)
                 }
                 .frame(height: 190)
+                .padding(.vertical, bentoGap)
 
                 // MARK: Bento Row 3 — Goal counter (full width, conditional)
                 GoalCounterCard()

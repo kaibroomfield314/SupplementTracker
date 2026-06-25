@@ -21,6 +21,7 @@ struct SettingsView: View {
     @AppStorage(UserPreferenceKeys.goalDays) private var goalDays: Int = 0
     @AppStorage(UserPreferenceKeys.notificationsEnabled) private var notificationsEnabled: Bool = false
     @AppStorage(UserPreferenceKeys.healthKitConnected) private var healthKitConnected: Bool = false
+    @AppStorage(UserPreferenceKeys.weightUnit) private var weightUnit: String = "kg"
 
     @State private var showNotificationsDeniedAlert = false
 
@@ -110,6 +111,10 @@ struct SettingsView: View {
                                 Label("Connect Apple Health", systemImage: "heart.fill")
                                     .foregroundStyle(.pink)
                             }
+                        }
+                        Picker("Weight unit", selection: $weightUnit) {
+                            Text("Metric (kg)").tag("kg")
+                            Text("Imperial (lbs)").tag("lbs")
                         }
                     } header: {
                         Text("Health")

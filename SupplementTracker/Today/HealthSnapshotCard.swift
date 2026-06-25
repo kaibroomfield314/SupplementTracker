@@ -4,6 +4,7 @@ import HealthKit
 struct HealthSnapshotCard: View {
     private let service = HealthService.shared
     @AppStorage(UserPreferenceKeys.healthKitConnected) private var healthKitConnected = false
+    @AppStorage(UserPreferenceKeys.weightUnit) private var weightUnit: String = "kg"
 
     var body: some View {
         VStack(alignment: .leading, spacing: DS.cardSpacing) {
@@ -80,15 +81,26 @@ struct HealthSnapshotCard: View {
 
     @ViewBuilder
     private func weightCell(_ snap: HealthSnapshot) -> some View {
-        let lbs = snap.weightKg.map { $0 * 2.20462 }
-        HealthMetricCell(
-            icon: "scalemass.fill",
-            label: "Weight",
-            value: lbs.map { String(format: "%.1f", $0) } ?? "—",
-            unit: lbs != nil ? "lbs" : nil,
-            trend: snap.weightTrend.map { $0 * 2.20462 },
-            tint: .blue
-        )
+        if weightUnit == "lbs" {
+            let lbs = snap.weightKg.map { $0 * 2.20462 }
+            HealthMetricCell(
+                icon: "scalemass.fill",
+                label: "Weight",
+                value: lbs.map { String(format: "%.1f", $0) } ?? "—",
+                unit: lbs != nil ? "lbs" : nil,
+                trend: snap.weightTrend.map { $0 * 2.20462 },
+                tint: .blue
+            )
+        } else {
+            HealthMetricCell(
+                icon: "scalemass.fill",
+                label: "Weight",
+                value: snap.weightKg.map { String(format: "%.1f", $0) } ?? "—",
+                unit: snap.weightKg != nil ? "kg" : nil,
+                trend: snap.weightTrend,
+                tint: .blue
+            )
+        }
     }
 
     @ViewBuilder

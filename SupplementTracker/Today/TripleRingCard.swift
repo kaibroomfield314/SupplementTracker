@@ -9,18 +9,17 @@ struct TripleRingCard: View {
     let otherTarget: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 8) {
             SectionLabel(text: "Breakdown")
-            HStack(spacing: 18) {
-                ringStack
-                    .frame(width: 92, height: 92)
-                VStack(spacing: 8) {
-                    row(label: "Vitamins", taken: vitaminsTaken, target: vitaminsTarget, accent: .accentColor)
-                    row(label: "Minerals", taken: mineralsTaken, target: mineralsTarget, accent: .primary.opacity(0.45))
-                    row(label: "Other",    taken: otherTaken,    target: otherTarget,    accent: .primary.opacity(0.25))
-                }
-                Spacer()
+            ringStack
+                .frame(width: 72, height: 72)
+                .frame(maxWidth: .infinity)
+            VStack(spacing: 6) {
+                row(label: "Vitamins", taken: vitaminsTaken, target: vitaminsTarget, accent: .accentColor)
+                row(label: "Minerals", taken: mineralsTaken, target: mineralsTarget, accent: .primary.opacity(0.45))
+                row(label: "Other",    taken: otherTaken,    target: otherTarget,    accent: .primary.opacity(0.25))
             }
+            Spacer(minLength: 0)
         }
         .cardSurface()
     }
@@ -32,10 +31,10 @@ struct TripleRingCard: View {
                  inset: 0)
             ring(progress: progress(mineralsTaken, mineralsTarget),
                  color: .primary.opacity(0.45),
-                 inset: 14)
+                 inset: 11)
             ring(progress: progress(otherTaken, otherTarget),
                  color: .primary.opacity(0.25),
-                 inset: 28)
+                 inset: 22)
         }
     }
 
@@ -60,7 +59,7 @@ struct TripleRingCard: View {
                 .font(.system(size: 10, weight: .semibold))
                 .tracking(0.5)
                 .foregroundStyle(.secondary)
-            Spacer(minLength: 8)
+            Spacer(minLength: 4)
             Text("\(taken)/\(max(1, target))")
                 .font(.system(size: 13, weight: .semibold).monospacedDigit())
                 .contentTransition(.numericText())
