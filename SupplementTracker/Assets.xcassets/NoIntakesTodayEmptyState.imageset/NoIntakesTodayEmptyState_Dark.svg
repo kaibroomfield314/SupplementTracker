@@ -1,0 +1,8 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Perfect square border — the empty log -->
+  <rect x="54" y="54" width="92" height="92"
+        fill="none" stroke="#FFFFFF" stroke-width="9"/>
+  <!-- Accent diagonal slash — the null mark -->
+  <line x1="63" y1="63" x2="137" y2="137"
+        stroke="#E5604A" stroke-width="7" stroke-linecap="square"/>
+</svg>

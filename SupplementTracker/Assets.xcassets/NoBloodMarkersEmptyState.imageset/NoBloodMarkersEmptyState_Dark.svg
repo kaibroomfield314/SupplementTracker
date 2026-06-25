@@ -1,0 +1,8 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Test tube — two walls, open top, semicircle bottom -->
+  <path d="M 83 65 L 83 150 A 17 17 0 0 0 117 150 L 117 65"
+        fill="none" stroke="#FFFFFF" stroke-width="9"/>
+  <!-- Accent drop suspended above the opening -->
+  <path d="M 100 20 C 107 27,111 33,111 40 A 11 11 0 0 1 89 40 C 89 33,93 27,100 20 Z"
+        fill="#E5604A"/>
+</svg>

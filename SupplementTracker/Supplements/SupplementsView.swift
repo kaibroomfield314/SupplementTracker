@@ -66,14 +66,12 @@ private struct SupplementsEmptyState: View {
     let onAdd: () -> Void
 
     var body: some View {
-        ContentUnavailableView {
-            Label("No supplements yet", systemImage: "pills")
-        } description: {
-            Text("Add the vitamins, minerals, and supplements you take.")
-        } actions: {
-            Button("Add Supplement", action: onAdd)
-                .buttonStyle(.borderedProminent)
-        }
+        EmptyStateIllustration(
+            imageName: "NoSupplementsEmptyState",
+            headline: "No supplements yet",
+            actionLabel: "Add your first supplement",
+            onAction: onAdd
+        )
     }
 }
 

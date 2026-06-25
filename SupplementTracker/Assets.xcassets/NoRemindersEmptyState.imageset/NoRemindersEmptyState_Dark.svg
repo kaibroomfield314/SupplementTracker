@@ -1,0 +1,8 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bell — dome bezier + straight skirt + bottom rim, stroke only -->
+  <path d="M 100 48 C 70 55,60 76,60 96 L 55 148 L 145 148 L 140 96 C 140 76,130 55,100 48 Z"
+        fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linejoin="miter"/>
+  <!-- Accent silence line — cuts through the bell -->
+  <line x1="50" y1="118" x2="150" y2="118"
+        stroke="#E5604A" stroke-width="7" stroke-linecap="square"/>
+</svg>

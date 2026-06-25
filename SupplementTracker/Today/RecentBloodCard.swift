@@ -7,10 +7,10 @@ struct RecentBloodCard: View {
         VStack(alignment: .leading, spacing: 10) {
             SectionLabel(text: "Blood", trailing: "\(markers.count)")
             if markers.isEmpty {
-                Text("Log a blood test to track trends")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 4)
+                EmptyStateIllustration(
+                    imageName: "NoBloodMarkersEmptyState",
+                    headline: "No blood test data"
+                )
             } else {
                 VStack(spacing: 0) {
                     ForEach(Array(markers.enumerated()), id: \.element.id) { idx, marker in

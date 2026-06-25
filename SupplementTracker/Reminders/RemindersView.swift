@@ -9,10 +9,9 @@ struct RemindersView: View {
     var body: some View {
         List {
             if reminders.isEmpty {
-                ContentUnavailableView(
-                    "No Reminders",
-                    systemImage: "bell.slash",
-                    description: Text("Tap + to schedule a stack reminder.")
+                EmptyStateIllustration(
+                    imageName: "NoRemindersEmptyState",
+                    headline: "No reminders set"
                 )
                 .listRowBackground(Color.clear)
             } else {

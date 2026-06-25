@@ -67,19 +67,12 @@ private struct EmptyIntakeRow: View {
     let onAdd: () -> Void
 
     var body: some View {
-        Button(action: onAdd) {
-            HStack(spacing: 8) {
-                Image(systemName: "plus")
-                    .font(.system(size: 11, weight: .semibold))
-                Text("LOG FIRST INTAKE")
-                    .font(.system(size: 11, weight: .semibold))
-                    .tracking(0.4)
-                Spacer()
-            }
-            .foregroundStyle(.secondary)
-            .padding(.vertical, 4)
-        }
-        .buttonStyle(.plain)
+        EmptyStateIllustration(
+            imageName: "NoIntakesTodayEmptyState",
+            headline: "Nothing logged today",
+            actionLabel: "Log first intake",
+            onAction: onAdd
+        )
     }
 }
 
