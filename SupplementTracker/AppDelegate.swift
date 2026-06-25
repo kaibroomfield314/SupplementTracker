@@ -30,7 +30,19 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         NotificationScheduler.registerCategories()
+        backfillIngredientFlag()
         return true
+    }
+
+    private func backfillIngredientFlag() {
+        let context = ModelContext(sharedModelContainer)
+        guard let all = try? context.fetch(FetchDescriptor<Supplement>()) else { return }
+        var dirty = false
+        for sup in all where !sup.isIngredient && sup.notes == "Auto-created from multivitamin ingredient" {
+            sup.isIngredient = true
+            dirty = true
+        }
+        if dirty { try? context.save() }
     }
 }
 

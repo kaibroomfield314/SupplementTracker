@@ -64,7 +64,7 @@ extension DashboardMetrics {
         var bestStreak: StreakInfo?
         for sup in supplements {
             let dates = intakes
-                .filter { $0.supplement === sup }
+                .filter { $0.supplement === sup && $0.sourceMultivitamin == nil }
                 .map { cal.startOfDay(for: $0.date) }
             let streakDays = StreakMath.currentStreak(intakeDays: dates, today: today)
             if streakDays > 0 {

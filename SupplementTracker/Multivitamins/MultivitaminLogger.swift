@@ -57,6 +57,7 @@ enum MultivitaminLogger {
             unit: unit,
             notes: "Auto-created from multivitamin ingredient"
         )
+        created.isIngredient = true
         context.insert(created)
         return created
     }

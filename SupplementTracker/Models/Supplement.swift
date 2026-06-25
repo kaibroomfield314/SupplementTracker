@@ -40,6 +40,7 @@ final class Supplement {
     var unit: String = "mg"
     var notes: String = ""
     var createdAt: Date = Date()
+    var isIngredient: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \SupplementIntake.supplement)
     var intakes: [SupplementIntake]? = []

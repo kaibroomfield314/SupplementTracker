@@ -3,7 +3,7 @@ import SwiftData
 
 struct SupplementsView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Supplement.name) private var supplements: [Supplement]
+    @Query(filter: #Predicate<Supplement> { $0.isIngredient == false }, sort: \Supplement.name) private var supplements: [Supplement]
     @State private var showingAdd = false
 
     var body: some View {
